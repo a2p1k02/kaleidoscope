@@ -171,7 +171,7 @@ std::unique_ptr<PrototypeAST> Parser::parseExtern() {
 void Parser::handleDefinition() {
     if (auto fn_ast = parseDefinition()) {
         if (auto* fn_ir = fn_ast->codegen()) {
-            fprintf(stderr, "Parsed a function definition:");
+            fprintf(stderr, "Parsed a function definition:\n");
             fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
         }
@@ -183,7 +183,7 @@ void Parser::handleDefinition() {
 void Parser::handleExtern() {
     if (auto proto_ast = parseExtern()) {
         if (auto* fn_ir = proto_ast->codegen()) {
-            fprintf(stderr, "Parsed an extern:");
+            fprintf(stderr, "Parsed an extern:\n");
             fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
         }
@@ -195,7 +195,7 @@ void Parser::handleExtern() {
 void Parser::handleTopLevelExpression() {
     if (auto fn_ast = parseTopLevelExpr()) {
         if (auto* fn_ir = fn_ast->codegen()) {
-            fprintf(stderr, "Parsed a top-level expr:");
+            fprintf(stderr, "Parsed a top-level expr:\n");
             fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
 

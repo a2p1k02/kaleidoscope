@@ -30,6 +30,8 @@ add_executable(kaleidoscope
         src/parser/parser.cpp
         src/main.cpp
         src/parser/parser_utils.hpp
+        src/kaleidoscope/compiler.cpp
+        src/kaleidoscope/compiler.h
 )
 
 target_include_directories(kaleidoscope PRIVATE

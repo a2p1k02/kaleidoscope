@@ -1,8 +1,6 @@
-#include "parser/parser.h"
+#include "kaleidoscope/compiler.h"
 
 int main() {
-    Parser parser;
-    parser.run();
-
+    Compiler compiler;
     return 0;
 }
