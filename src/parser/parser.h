@@ -24,9 +24,6 @@ private:
     int getNextToken();
     int getTokPrecedence();
 
-    static std::unique_ptr<ExprAST> logError(const char *str);
-    static std::unique_ptr<PrototypeAST> logErrorP(const char *str);
-
     std::unique_ptr<ExprAST> parseExpression();
     std::unique_ptr<ExprAST> parseNumberExpr();
     std::unique_ptr<ExprAST> parseParenExpr();

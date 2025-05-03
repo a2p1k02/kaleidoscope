@@ -10,6 +10,11 @@ Parser::Parser() : m_current_tok(0) {
 
     fprintf(stderr, "ready> ");
     getNextToken();
+
+    m_context = std::make_unique<llvm::LLVMContext>();
+    m_module = std::make_unique<llvm::Module>("jit", *m_context);
+
+    m_builder = std::make_unique<llvm::IRBuilder<>>(*m_context);
 }
 
 int Parser::getNextToken() {
@@ -23,16 +28,6 @@ int Parser::getTokPrecedence() {
     int tok = binops[m_current_tok];
     if (tok <= 0) return -1;
     return tok;
-}
-
-std::unique_ptr<ExprAST> Parser::logError(const char *str) {
-    fprintf(stderr, "Error: %s\n", str);
-    return nullptr;
-}
-
-std::unique_ptr<PrototypeAST> Parser::logErrorP(const char *str) {
-    logError(str);
-    return nullptr;
 }
 
 std::unique_ptr<ExprAST> Parser::parseExpression() {
@@ -174,24 +169,38 @@ std::unique_ptr<PrototypeAST> Parser::parseExtern() {
 }
 
 void Parser::handleDefinition() {
-    if (parseDefinition()) {
-        fprintf(stderr, "Parsed a function definition.\n");
+    if (auto fn_ast = parseDefinition()) {
+        if (auto* fn_ir = fn_ast->codegen()) {
+            fprintf(stderr, "Parsed a function definition:");
+            fn_ir->print(llvm::errs());
+            fprintf(stderr, "\n");
+        }
     } else {
         getNextToken();
     }
 }
 
 void Parser::handleExtern() {
-    if (parseExtern()) {
-        fprintf(stderr, "Parsed an extern\n");
+    if (auto proto_ast = parseExtern()) {
+        if (auto* fn_ir = proto_ast->codegen()) {
+            fprintf(stderr, "Parsed an extern:");
+            fn_ir->print(llvm::errs());
+            fprintf(stderr, "\n");
+        }
     } else {
         getNextToken();
     }
 }
 
 void Parser::handleTopLevelExpression() {
-    if (parseTopLevelExpr()) {
-        fprintf(stderr, "Parsed a top-level expr\n");
+    if (auto fn_ast = parseTopLevelExpr()) {
+        if (auto* fn_ir = fn_ast->codegen()) {
+            fprintf(stderr, "Parsed a top-level expr:");
+            fn_ir->print(llvm::errs());
+            fprintf(stderr, "\n");
+
+            fn_ir->eraseFromParent();
+        }
     } else {
         getNextToken();
     }
@@ -217,5 +226,6 @@ void Parser::run() {
                 break;
         }
     }
+    m_module->print(llvm::errs(), nullptr);
 }
 
